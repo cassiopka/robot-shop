@@ -8,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git 'https://github.com/cassiopka/robot-shop.git'
+                git 'https://github.com/cassiopka/robot-shop.git', branch: 'main'
             }
         }
 
