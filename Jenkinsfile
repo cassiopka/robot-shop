@@ -49,7 +49,18 @@ pipeline {
             }
             steps {
                 script {
-                    sh 'mvn checkstyle:checkstyle'
+                    dir('cart') {
+                        sh 'mvn checkstyle:checkstyle'
+                    }
+                    dir('catalogue') {
+                        sh 'mvn checkstyle:checkstyle'
+                    }
+                    dir('shipping') {
+                        sh 'mvn checkstyle:checkstyle'
+                    }
+                    dir('user') {
+                        sh 'mvn checkstyle:checkstyle'
+                    }
                 }
             }
         }
@@ -66,12 +77,22 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: SONAR_CREDENTIALS_ID, usernameVariable: 'SONAR_USERNAME', passwordVariable: 'SONAR_PASSWORD')]) {
-                        sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
+                        dir('cart') {
+                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
+                        }
+                        dir('catalogue') {
+                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
+                        }
+                        dir('shipping') {
+                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
+                        }
+                        dir('user') {
+                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
+                        }
                     }
                 }
             }
         }
-
         stage('Build Docker Image') {
             agent {
                 node {
