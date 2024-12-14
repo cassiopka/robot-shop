@@ -42,24 +42,6 @@ pipeline {
             }
         }
 
-        stage('Checkout on PROD') {
-            agent {
-                node {
-                    label 'prod'
-                }
-            }
-            steps {
-                script {
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: 'prod']],
-                        userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
-                    ])
-                    env.BRANCH_NAME = 'prod'
-                }
-            }
-        }
-
         stage('Build Docker Image') {
             agent {
                 node {
@@ -67,7 +49,7 @@ pipeline {
                 }
             }
             when {
-                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'prod' }
+                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' }
             }
             steps {
                 script {
@@ -87,7 +69,7 @@ pipeline {
                 }
             }
             when {
-                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'prod' }
+                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' }
             }
             steps {
                 script {
@@ -104,23 +86,6 @@ pipeline {
             }
             when {
                 expression { env.BRANCH_NAME == 'dev' }
-            }
-            steps {
-                script {
-                    sh 'docker-compose pull'
-                    sh 'docker-compose up -d'
-                }
-            }
-        }
-
-        stage('Deploy to PROD') {
-            agent {
-                node {
-                    label 'prod'
-                }
-            }
-            when {
-                expression { env.BRANCH_NAME == 'prod' }
             }
             steps {
                 script {
