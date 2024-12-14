@@ -1,0 +1,139 @@
+pipeline {
+    agent none
+
+    environment {
+        DOCKER_CREDENTIALS_ID = 'f86b8146-c934-4d88-a298-b0e675dd9be6'
+    }
+
+    stages {
+        stage('Checkout on TEST') {
+            agent {
+                node {
+                    label 'test'
+                }
+            }
+            steps {
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'test']],
+                        userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
+                    ])
+                    env.BRANCH_NAME = 'test'
+                }
+            }
+        }
+
+        stage('Checkout on DEV') {
+            agent {
+                node {
+                    label 'dev'
+                }
+            }
+            steps {
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'dev']],
+                        userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
+                    ])
+                    env.BRANCH_NAME = 'dev'
+                }
+            }
+        }
+
+        stage('Checkout on PROD') {
+            agent {
+                node {
+                    label 'prod'
+                }
+            }
+            steps {
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'prod']],
+                        userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
+                    ])
+                    env.BRANCH_NAME = 'prod'
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            agent {
+                node {
+                    label 'test'
+                }
+            }
+            when {
+                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'prod' }
+            }
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    }
+
+                    sh 'docker-compose build'
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            agent {
+                node {
+                    label 'test'
+                }
+            }
+            when {
+                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' || env.BRANCH_NAME == 'prod' }
+            }
+            steps {
+                script {
+                    sh 'docker-compose push'
+                }
+            }
+        }
+
+        stage('Deploy to DEV') {
+            agent {
+                node {
+                    label 'dev'
+                }
+            }
+            when {
+                expression { env.BRANCH_NAME == 'dev' }
+            }
+            steps {
+                script {
+                    sh 'docker-compose pull'
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+
+        stage('Deploy to PROD') {
+            agent {
+                node {
+                    label 'prod'
+                }
+            }
+            when {
+                expression { env.BRANCH_NAME == 'prod' }
+            }
+            steps {
+                script {
+                    sh 'docker-compose pull'
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+    }
+}
