@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent any
 
     environment {
         DOCKER_CREDENTIALS_ID = 'f86b8146-c934-4d88-a298-b0e675dd9be6'
@@ -44,12 +44,7 @@ pipeline {
 
     post {
         always {
-            node {
-                label 'prod'
-            }
-            steps {
-                cleanWs()
-            }
+            cleanWs()
         }
     }
 }
