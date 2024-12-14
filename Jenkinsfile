@@ -98,7 +98,12 @@ pipeline {
 
     post {
         always {
-            cleanWs()
+            node {
+                label 'test'
+            }
+            steps {
+                cleanWs()
+            }
         }
     }
 }
