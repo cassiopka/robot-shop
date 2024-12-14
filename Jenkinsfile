@@ -49,9 +49,7 @@ pipeline {
             }
             steps {
                 script {
-                    dir('shipping') {
-                        sh 'mvn checkstyle:checkstyle'
-                    }
+                        sh 'cd shipping && mvn checkstyle:checkstyle'
                 }
             }
         }
