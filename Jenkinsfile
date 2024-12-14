@@ -66,7 +66,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: SONAR_CREDENTIALS_ID, usernameVariable: 'SONAR_USERNAME', passwordVariable: 'SONAR_PASSWORD')]) {
-                            sh 'cd shipping && mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
+                            sh 'cd shipping && mvn clean compile && mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
                     }
                 }
             }
