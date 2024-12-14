@@ -6,13 +6,6 @@ pipeline {
     }
 
     stages {
-        stage('Checkout') {
-            steps {
-                git url: 'https://github.com/cassiopka/robot-shop.git', branch: 'main'
-            }
-        }
-
-        stage('Build and Push Docker Image') {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
@@ -20,6 +13,7 @@ pipeline {
                     }
 
                     sh 'docker-compose build'
+
                     sh 'docker-compose push'
                 }
             }
