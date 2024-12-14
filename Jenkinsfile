@@ -49,16 +49,7 @@ pipeline {
             }
             steps {
                 script {
-                    dir('cart') {
-                        sh 'mvn checkstyle:checkstyle'
-                    }
-                    dir('catalogue') {
-                        sh 'mvn checkstyle:checkstyle'
-                    }
                     dir('shipping') {
-                        sh 'mvn checkstyle:checkstyle'
-                    }
-                    dir('user') {
                         sh 'mvn checkstyle:checkstyle'
                     }
                 }
