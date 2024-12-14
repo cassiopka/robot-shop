@@ -1,5 +1,5 @@
 pipeline {
-    agent none
+    agent any
 
     environment {
         DOCKER_CREDENTIALS_ID = 'f86b8146-c934-4d88-a298-b0e675dd9be6'
@@ -7,11 +7,6 @@ pipeline {
 
     stages {
         stage('Checkout on TEST') {
-            agent {
-                node {
-                    label 'test'
-                }
-            }
             steps {
                 script {
                     checkout([
@@ -43,11 +38,6 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            agent {
-                node {
-                    label 'test'
-                }
-            }
             when {
                 expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' }
             }
@@ -63,11 +53,6 @@ pipeline {
         }
 
         stage('Push Docker Image') {
-            agent {
-                node {
-                    label 'test'
-                }
-            }
             when {
                 expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' }
             }
@@ -98,12 +83,7 @@ pipeline {
 
     post {
         always {
-            node {
-                label 'test'
-            }
-            steps {
-                cleanWs()
-            }
+            cleanWs()
         }
     }
 }
