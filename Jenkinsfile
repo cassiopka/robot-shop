@@ -66,18 +66,7 @@ pipeline {
             steps {
                 script {
                     withCredentials([usernamePassword(credentialsId: SONAR_CREDENTIALS_ID, usernameVariable: 'SONAR_USERNAME', passwordVariable: 'SONAR_PASSWORD')]) {
-                        dir('cart') {
-                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
-                        }
-                        dir('catalogue') {
-                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
-                        }
-                        dir('shipping') {
-                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
-                        }
-                        dir('user') {
-                            sh 'mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
-                        }
+                            sh 'cd shipping && mvn sonar:sonar -Dsonar.login=$SONAR_USERNAME -Dsonar.password=$SONAR_PASSWORD'
                     }
                 }
             }
