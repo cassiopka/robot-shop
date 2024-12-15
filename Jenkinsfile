@@ -8,6 +8,11 @@ pipeline {
 
     stages {
         stage('Checkout on TEST') {
+            agent {
+                node {
+                    label 'test'
+                }
+            }
             steps {
                 script {
                     checkout([
@@ -20,23 +25,23 @@ pipeline {
             }
         }
 
-        stage('Checkout on DEV') {
-            agent {
-                node {
-                    label 'dev'
-                }
-            }
-            steps {
-                script {
-                    checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: 'dev']],
-                        userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
-                    ])
-                    env.BRANCH_NAME = 'dev'
-                }
-            }
-        }
+        // stage('Checkout on DEV') {
+        //     agent {
+        //         node {
+        //             label 'dev'
+        //         }
+        //     }
+        //     steps {
+        //         script {
+        //             checkout([
+        //                 $class: 'GitSCM',
+        //                 branches: [[name: 'dev']],
+        //                 userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
+        //             ])
+        //             env.BRANCH_NAME = 'dev'
+        //         }
+        //     }
+        // }
 
         stage('Code Quality Analysis') {
             agent {
@@ -107,23 +112,23 @@ pipeline {
             }
         }
 
-        stage('Deploy to DEV') {
-            agent {
-                node {
-                    label 'dev'
-                }
-            }
-            when {
-                expression { env.BRANCH_NAME == 'dev' }
-            }
-            steps {
-                script {
-                    sh 'docker-compose pull'
-                    sh 'docker-compose up -d'
-                }
-            }
-        }
-    }
+    //     stage('Deploy to DEV') {
+    //         agent {
+    //             node {
+    //                 label 'dev'
+    //             }
+    //         }
+    //         when {
+    //             expression { env.BRANCH_NAME == 'dev' }
+    //         }
+    //         steps {
+    //             script {
+    //                 sh 'docker-compose pull'
+    //                 sh 'docker-compose up -d'
+    //             }
+    //         }
+    //     }
+    // }
 
     post {
         always {
