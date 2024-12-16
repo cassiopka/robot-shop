@@ -55,6 +55,7 @@ pipeline {
             }
             steps {
                 script {
+                        sh 'echo "export PATH=/usr/local/go/bin:${PATH}" | tee -a $HOME/.profile'
                         sh 'go mod init github.com/cassiopka/robot-shop.git/distplash'
                         sh 'cd dispatch && go test -v /home/jenkins/tests'
                 }
