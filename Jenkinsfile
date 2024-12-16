@@ -4,6 +4,7 @@ pipeline {
     environment {
         DOCKER_CREDENTIALS_ID = 'f86b8146-c934-4d88-a298-b0e675dd9be6'
         SONAR_CREDENTIALS_ID = 'ee167194-2d67-400e-b640-14cc1cbad27c'
+        SUDO_PASSWORD_ID = 'aa441431-cedd-4eb6-9aca-4772d1cb6e73' 
     }
     
 
@@ -45,11 +46,10 @@ pipeline {
         // }
 
 
-        stage('Code Unit testing') {
+        stage('Install Go') {
             agent {
-                docker {
-                    image 'golang:1.23.4'
-                    args '-v /home/jenkins/agent/workspace:/workspace'
+                node {
+                    label 'test'
                 }
             }
             when {
@@ -57,9 +57,35 @@ pipeline {
             }
             steps {
                 script {
-                    sh 'go get github.com/streadway/amqp'
-                    sh 'go get github.com/opentracing/opentracing-go/log; go get github.com/opentracing/opentracing-go/ext; go get github.com/opentracing/opentracing-go; go get github.com/instana/go-sensor'
-                    sh 'go test -v tests/'
+                    withCredentials([string(credentialsId: SUDO_PASSWORD_ID, variable: 'SUDO_PASSWORD')]) {
+                        sh '''
+                        curl -LO https://go.dev/dl/go1.23.4.linux-amd64.tar.gz
+                        echo $SUDO_PASSWORD | sudo -S tar -C /usr/local -xzf go1.23.4.linux-amd64.tar.gz
+                        export PATH=$PATH:/usr/local/go/bin
+                        go get github.com/streadway/amqp
+                        go get github.com/opentracing/opentracing-go/log
+                        go get github.com/opentracing/opentracing-go/ext
+                        go get github.com/opentracing/opentracing-go
+                        go get github.com/instana/go-sensor
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('Code Unit testing') {
+            agent {
+                node {
+                    label 'test'
+                }
+            }
+            when {
+                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' }
+            }
+            steps {
+                script {
+                    sh 'go mod init github.com/cassiopka/robot-shop.git/distplash'
+                    sh 'cd dispatch && go test -v /home/jenkins/tests'
                 }
             }
         }
