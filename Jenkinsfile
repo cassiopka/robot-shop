@@ -22,9 +22,6 @@ pipeline {
                         userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
                     ])
                     env.BRANCH_NAME = 'test'
-                                        withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
-                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
-                    }
                 }
             }
         }
@@ -52,7 +49,7 @@ pipeline {
             agent {
                 docker {
                     image 'golang:1.23.4'
-                    args '-v /home/jenkins/agent/workspace/dev and test@2@tmp:/workspace'
+                    args '-v /home/jenkins/agent/workspace:/workspace'
                 }
             }
             when {
@@ -110,6 +107,10 @@ pipeline {
             }
             steps {
                 script {
+                    withCredentials([usernamePassword(credentialsId: DOCKER_CREDENTIALS_ID, usernameVariable: 'DOCKER_USERNAME', passwordVariable: 'DOCKER_PASSWORD')]) {
+                        sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin'
+                    }
+
                     sh 'docker-compose build'
                 }
             }
