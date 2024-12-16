@@ -38,12 +38,7 @@ pipeline {
             }
             steps {
                 script {
-                    sh 'go get github.com/streadway/amqp'
-                    sh 'go get github.com/opentracing/opentracing-go/log'
-                    sh 'go get github.com/opentracing/opentracing-go/ext'
-                    sh 'go get github.com/opentracing/opentracing-go'
-                    sh 'go get github.com/instana/go-sensor'
-                    sh 'cd dispatch && go test -v'
+                    sh 'cd dispatch && go get -v &&  go test -v'
                 }
             }
         }
