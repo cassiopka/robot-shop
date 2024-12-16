@@ -8,7 +8,6 @@ import (
 	"os"
 	"strconv"
 	"time"
-
 	"github.com/instana/go-sensor"
 	ot "github.com/opentracing/opentracing-go"
 	"github.com/opentracing/opentracing-go/ext"
@@ -86,10 +85,15 @@ func rabbitConnector(uri string) {
 }
 
 func failOnError(err error, msg string) {
-	if err != nil {
-		log.Fatalf("%s : %s", msg, err)
-	}
+    if err != nil {
+        if os.Getenv("TEST_MODE") == "true" {
+            log.Printf("%s : %s", msg, err)
+        } else {
+            log.Fatalf("%s : %s", msg, err)
+        }
+    }
 }
+
 
 func getOrderId(order []byte) string {
 	id := "unknown"

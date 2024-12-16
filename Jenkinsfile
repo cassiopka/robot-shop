@@ -25,23 +25,41 @@ pipeline {
             }
         }
 
-        // stage('Checkout on DEV') {
-        //     agent {
-        //         node {
-        //             label 'dev'
-        //         }
-        //     }
-        //     steps {
-        //         script {
-        //             checkout([
-        //                 $class: 'GitSCM',
-        //                 branches: [[name: 'dev']],
-        //                 userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
-        //             ])
-        //             env.BRANCH_NAME = 'dev'
-        //         }
-        //     }
-        // }
+        stage('Checkout on DEV') {
+            agent {
+                node {
+                    label 'dev'
+                }
+            }
+            steps {
+                script {
+                    checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'dev']],
+                        userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
+                    ])
+                    env.BRANCH_NAME = 'dev'
+                }
+            }
+        }
+
+
+        stage('Code Unit testing') {
+            agent {
+                node {
+                    label 'test'
+                }
+            }
+            when {
+                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' }
+            }
+            steps {
+                script {
+                        sh 'go mod init github.com/cassiopka/robot-shop.git/distplash'
+                        sh 'cd dispatch && go test -v /home/jenkins/tests'
+                }
+            }
+        }
 
         stage('Code Quality Analysis') {
             agent {
@@ -112,22 +130,22 @@ pipeline {
             }
         }
 
-    //     stage('Deploy to DEV') {
-    //         agent {
-    //             node {
-    //                 label 'dev'
-    //             }
-    //         }
-    //         when {
-    //             expression { env.BRANCH_NAME == 'dev' }
-    //         }
-    //         steps {
-    //             script {
-    //                 sh 'docker-compose pull'
-    //                 sh 'docker-compose up -d'
-    //             }
-    //         }
-    //     }
+        stage('Deploy to DEV') {
+            agent {
+                node {
+                    label 'dev'
+                }
+            }
+            when {
+                expression { env.BRANCH_NAME == 'dev' }
+            }
+            steps {
+                script {
+                    sh 'docker-compose pull'
+                    sh 'docker-compose up -d'
+                }
+            }
+        }
     }
 
     post {
