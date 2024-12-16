@@ -57,6 +57,8 @@ pipeline {
             }
             steps {
                 script {
+                    sh 'go get github.com/streadway/amqp'
+                    sh 'go get github.com/opentracing/opentracing-go/log; go get github.com/opentracing/opentracing-go/ext; go get github.com/opentracing/opentracing-go; go get github.com/instana/go-sensor'
                     sh 'go test -v tests/'
                 }
             }
