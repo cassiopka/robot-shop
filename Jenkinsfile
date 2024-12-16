@@ -5,6 +5,7 @@ pipeline {
         DOCKER_CREDENTIALS_ID = 'f86b8146-c934-4d88-a298-b0e675dd9be6'
         SONAR_CREDENTIALS_ID = 'ee167194-2d67-400e-b640-14cc1cbad27c'
     }
+    
 
     stages {
         stage('Checkout on TEST') {
@@ -55,7 +56,9 @@ pipeline {
             }
             steps {
                 script {
-                        sh 'echo "export PATH=/usr/local/go/bin:${PATH}" | tee -a $HOME/.profile'
+                        sh 'curl -LO https://go.dev/dl/go1.23.4.linux-amd64.tar.gz'
+                        sh 'sudo tar -C /usr/local -xzvf go1.23.4.linux-amd64.tar.gz'
+                        sh 'echo "export PATH=/usr/local/go/bin:${PATH}" | sudo tee -a $HOME/.profile'
                         sh 'go mod init github.com/cassiopka/robot-shop.git/distplash'
                         sh 'cd dispatch && go test -v /home/jenkins/tests'
                 }
