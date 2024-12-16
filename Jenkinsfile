@@ -45,7 +45,7 @@ pipeline {
         // }
 
 
-        stage('Install Go') {
+        stage('Code Unit testing') {
             agent {
                 node {
                     label 'test'
@@ -65,22 +65,8 @@ pipeline {
                         go get github.com/opentracing/opentracing-go/ext
                         go get github.com/opentracing/opentracing-go
                         go get github.com/instana/go-sensor
+                        echo "export PATH=/usr/local/go/bin:${PATH}" | tee -a $HOME/.profile
                         '''
-                }
-            }
-        }
-
-        stage('Code Unit testing') {
-            agent {
-                node {
-                    label 'test'
-                }
-            }
-            when {
-                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' }
-            }
-            steps {
-                script {
                     sh 'go mod init github.com/cassiopka/robot-shop.git/distplash'
                     sh 'cd dispatch && go test -v /home/jenkins/tests'
                 }
