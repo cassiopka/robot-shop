@@ -58,7 +58,7 @@ pipeline {
             steps {
                 script {
                     sh 'go mod init github.com/cassiopka/robot-shop.git/distplash'
-                    sh 'cd dispatch && go test -v /workspace/tests'
+                    sh 'go test -v tests/'
                 }
             }
         }
