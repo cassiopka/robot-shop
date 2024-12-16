@@ -21,6 +21,7 @@ pipeline {
                         userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
                     ])
                     env.BRANCH_NAME = 'test'
+                    sh 'cp -v /tmp/test/main_test.go dispatch/'
                 }
             }
         }
@@ -42,7 +43,7 @@ pipeline {
                     sh 'go get github.com/opentracing/opentracing-go/ext'
                     sh 'go get github.com/opentracing/opentracing-go'
                     sh 'go get github.com/instana/go-sensor'
-                    sh 'cd dispatch && go test -v /workspace/tests'
+                    sh 'cd dispatch && go test -v'
                 }
             }
         }
