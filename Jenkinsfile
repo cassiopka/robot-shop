@@ -47,8 +47,9 @@ pipeline {
 
         stage('Code Unit testing') {
             agent {
-                node {
-                    label 'test'
+                docker {
+                    image 'golang:1.23.4'
+                    args '-v /home/jenkins/agent/workspace/dev and test@2@tmp:/workspace'
                 }
             }
             when {
@@ -56,11 +57,8 @@ pipeline {
             }
             steps {
                 script {
-                        sh 'curl -LO https://go.dev/dl/go1.23.4.linux-amd64.tar.gz'
-                        sh 'sudo tar -C /usr/local -xzvf go1.23.4.linux-amd64.tar.gz'
-                        sh 'echo "export PATH=/usr/local/go/bin:${PATH}" | sudo tee -a $HOME/.profile'
-                        sh 'go mod init github.com/cassiopka/robot-shop.git/distplash'
-                        sh 'cd dispatch && go test -v /home/jenkins/tests'
+                    sh 'go mod init github.com/cassiopka/robot-shop.git/distplash'
+                    sh 'cd dispatch && go test -v /workspace/tests'
                 }
             }
         }
