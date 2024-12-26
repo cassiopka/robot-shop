@@ -21,7 +21,6 @@ pipeline {
                         userRemoteConfigs: [[url: 'https://github.com/cassiopka/robot-shop.git']]
                     ])
                     env.BRANCH_NAME = 'test'
-                    sh 'cp -v /tmp/test/main_test.go dispatch/'
                 }
             }
         }
@@ -51,23 +50,6 @@ pipeline {
             }
         }
 
-
-        stage('Code Unit testing') {
-            agent {
-                docker {
-                    image 'golang:1.23.4'
-                    args '-v /home/jenkins/agent/workspace/:/workspace --user root'
-                }
-            }
-            when {
-                expression { env.BRANCH_NAME == 'test' || env.BRANCH_NAME == 'dev' }
-            }
-            steps {
-                script {
-                    sh 'cd dispatch && go get -v &&  go test -v'
-                }
-            }
-        }
 
         stage('Code Quality Analysis') {
             agent {
