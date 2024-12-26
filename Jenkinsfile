@@ -26,7 +26,7 @@ pipeline {
             }
         }
 
-        stage('Security Analysis') {
+        stage('Security Analysis DB') {
             agent {
                 node {
                     label 'test'
